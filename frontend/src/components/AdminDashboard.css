@@ -146,7 +146,6 @@ body {
 
 .user-profile-modal button {
     background-color: #87CEEB;
-    /* Light blue for modal button */
     color: white;
     border: none;
     padding: 8px 16px;
@@ -192,7 +191,7 @@ body {
     align-items: center;
     margin-bottom: 15px;
     font-size: 14px;
-    cursor: pointer
+    cursor: pointer;
 }
 
 .task-form label input[type="checkbox"] {
@@ -251,41 +250,72 @@ body {
     color: #555;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .admin-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+/* Button Styles */
+.edit-task-button {
+    background-color: #4CAF50;
+    /* Green */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
 
-    .admin-header h1 {
-        margin-bottom: 10px;
-    }
+.edit-task-button:hover {
+    background-color: #45a049;
+    /* Darker green */
+}
 
-    .admin-header button {
-        margin: 5px 0;
-    }
+.cancel-button {
+    background-color: #f44336;
+    /* Red */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
 
-    .user-details table {
-        font-size: 12px;
-    }
+.cancel-button:hover {
+    background-color: #d32f2f;
+    /* Darker red */
+}
 
-    .user-details th,
-    .user-details td {
-        padding: 8px;
-    }
+.create-task-button {
+    background-color: #2196F3;
+    /* Blue */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
 
-    .task-form input,
-    .task-form textarea,
-    .task-form select {
-        font-size: 12px;
-    }
+.create-task-button:hover {
+    background-color: #1976D2;
+    /* Darker blue */
+}
 
-    .task-list h3 {
-        font-size: 14px;
-    }
+.delete-task-button {
+    background-color: #ff4444;
+    /* Red */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
 
-    .task-list p {
-        font-size: 12px;
-    }
+.delete-task-button:hover {
+    background-color: #cc0000;
+    /* Darker red */
 }

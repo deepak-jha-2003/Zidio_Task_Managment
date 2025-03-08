@@ -59,3 +59,43 @@ exports.getAllTasks = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
+
+// Update a task
+exports.updateTask = async (req, res) => {
+    // console.log('Updating task with ID:', req.params.id); 
+    // console.log('Request body:', req.body); 
+
+    const { title, description, startTime, endTime, userId, broadcast } = req.body;
+    try {
+        let task = await Task.findById(req.params.id);
+        if (!task) return res.status(404).json({ msg: 'Task not found' });
+
+        task.title = title;
+        task.description = description;
+        task.startTime = startTime;
+        task.endTime = endTime;
+        task.user = userId;
+        task.broadcast = broadcast;
+
+        await task.save();
+        res.json(task);
+    } catch (err) {
+        // console.error('Error updating task:', err); 
+        res.status(500).send('Server error');
+    }
+};
+
+// Delete a task
+exports.deleteTask = async (req, res) => {
+    // console.log('Deleting task with ID:', req.params.id); 
+    try {
+        const task = await Task.findById(req.params.id);
+        if (!task) return res.status(404).json({ msg: 'Task not found' });
+
+        await task.deleteOne();
+        res.json({ msg: 'Task deleted' });
+    } catch (err) {
+        // console.error('Error deleting task:', err); 
+        res.status(500).send('Server error');
+    }
+};
