@@ -22,10 +22,10 @@ const AdminDashboard = () => {
       const token = localStorage.getItem('token');
       if (!token) {
         console.error('No token found');
-        navigate('/admin/login'); // Redirect to login if no token
+        navigate('/admin/login'); 
         return;
       }
-      console.log('Token:', token); // Debugging: Log the token
+      // console.log('Token:', token); 
       const res = await axios.get('http://localhost:5000/api/admin/users', {
         headers: { 'x-auth-token': token },
       });
@@ -33,8 +33,8 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error('Error fetching users:', err);
       if (err.response?.status === 401) {
-        localStorage.removeItem('token'); // Clear invalid token
-        navigate('/admin/login'); // Redirect to login
+        localStorage.removeItem('token'); 
+        navigate('/admin/login'); 
       }
     }
   };
@@ -55,8 +55,8 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error('Error fetching tasks:', err);
       if (err.response?.status === 401) {
-        localStorage.removeItem('token'); // Clear invalid token
-        navigate('/admin/login'); // Redirect to login
+        localStorage.removeItem('token'); 
+        navigate('/admin/login'); 
       }
     }
   };
