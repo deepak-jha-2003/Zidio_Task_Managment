@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -11,39 +12,60 @@ const AdminDashboard = () => {
   const [broadcast, setBroadcast] = useState(false);
   const [users, setUsers] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [showUserDetails, setShowUserDetails] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch all users
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/admin/users', {
-          headers: { 'x-auth-token': token },
-        });
-        setUsers(res.data);
-      } catch (err) {
-        console.error('Error fetching users:', err);
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        navigate('/admin/login'); // Redirect to login if no token
+        return;
       }
-    };
-    fetchUsers();
-  }, []);
+      console.log('Token:', token); // Debugging: Log the token
+      const res = await axios.get('http://localhost:5000/api/admin/users', {
+        headers: { 'x-auth-token': token },
+      });
+      setUsers(res.data);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token'); // Clear invalid token
+        navigate('/admin/login'); // Redirect to login
+      }
+    }
+  };
 
   // Fetch all tasks
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/tasks/all', {
-          headers: { 'x-auth-token': token },
-        });
-        setTasks(res.data);
-      } catch (err) {
-        console.error('Error fetching tasks:', err);
+  const fetchTasks = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        navigate('/admin/login'); // Redirect to login if no token
+        return;
       }
-    };
+      const res = await axios.get('http://localhost:5000/api/tasks/all', {
+        headers: { 'x-auth-token': token },
+      });
+      setTasks(res.data);
+    } catch (err) {
+      console.error('Error fetching tasks:', err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token'); // Clear invalid token
+        navigate('/admin/login'); // Redirect to login
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
     fetchTasks();
   }, []);
-
+  
   // Handle task creation
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,9 +88,97 @@ const AdminDashboard = () => {
     }
   };
 
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/admin/login');
+  };
+
+  // Toggle user details visibility
+  const toggleUserDetails = () => {
+    setShowUserDetails(!showUserDetails);
+  };
+
+  // Handle view profile
+  const handleViewProfile = (user) => {
+    setSelectedUser(user);
+  };
+
+  // Handle delete user
+  const handleDeleteUser = async (userId) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/admin/users/${userId}`, {
+        headers: { 'x-auth-token': token },
+      });
+      setUsers(users.filter((user) => user._id !== userId));
+    } catch (err) {
+      console.error('Error deleting user:', err);
+    }
+  };
+
   return (
     <div className="admin-dashboard">
-      <h1>Admin Dashboard</h1>
+      <header className="admin-header">
+        <h1>Admin Dashboard</h1>
+        <div>
+          <button onClick={handleLogout}>Logout</button>
+          <button onClick={toggleUserDetails} className="users-button">
+            {showUserDetails ? 'Hide Users' : 'Show Users'}
+          </button>
+        </div>
+      </header>
+
+      {showUserDetails && (
+        <div className="user-details">
+          <h2>User Details</h2>
+          <div className="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Occupation</th>
+                  <th>Address</th>
+                  <th>Phone Number</th>
+                  <th>Social Links</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user._id}>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>{user.occupation}</td>
+                    <td>{user.address}</td>
+                    <td>{user.phoneNumber}</td>
+                    <td>{user.socialLinks.join(', ')}</td>
+                    <td>
+                      <button onClick={() => handleViewProfile(user)}>View Profile</button>
+                      <button onClick={() => handleDeleteUser(user._id)}>Delete User</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {selectedUser && (
+        <div className="user-profile-modal">
+          <h2>User Profile</h2>
+          <p><strong>Name:</strong> {selectedUser.name}</p>
+          <p><strong>Email:</strong> {selectedUser.email}</p>
+          <p><strong>Occupation:</strong> {selectedUser.occupation}</p>
+          <p><strong>Address:</strong> {selectedUser.address}</p>
+          <p><strong>Phone Number:</strong> {selectedUser.phoneNumber}</p>
+          <p><strong>Social Links:</strong> {selectedUser.socialLinks.join(', ')}</p>
+          <button onClick={() => setSelectedUser(null)}>Close</button>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="task-form">
         <input
           type="text"
@@ -119,15 +229,15 @@ const AdminDashboard = () => {
 
       <h2>All Tasks</h2>
       <div className="task-list">
-      {tasks.map((task) => (
-        <div key={task._id}>
-          <h3>{task.title}</h3>
-          <p>{task.description}</p>
-          <p>Start Time: {new Date(task.startTime).toLocaleString()}</p>
-          <p>End Time: {new Date(task.endTime).toLocaleString()}</p>
-          <p>Assigned To: {task.user ? task.user.name : 'Broadcasted to all users'}</p>
-        </div>
-      ))}
+        {tasks.map((task) => (
+          <div key={task._id}>
+            <h3>{task.title}</h3>
+            <p>{task.description}</p>
+            <p>Start Time: {new Date(task.startTime).toLocaleString()}</p>
+            <p>End Time: {new Date(task.endTime).toLocaleString()}</p>
+            <p>Assigned To: {task.user ? task.user.name : 'Broadcasted to all users'}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

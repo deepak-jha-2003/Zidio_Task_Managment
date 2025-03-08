@@ -1,60 +1,291 @@
-/* AdminDashboard.css */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f8ff;
+    color: #333;
+}
+
 .admin-dashboard {
-    max-width: 800px;
-    margin: 20px auto;
     padding: 20px;
-    background: #fff;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #87CEEB;
+    color: white;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.admin-dashboard h1 {
-    text-align: center;
-    margin-bottom: 20px;
+.admin-header h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
 }
 
+.admin-header button {
+    background-color: #4682B4;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.admin-header button:hover {
+    background-color: #5F9EA0;
+}
+
+/* User Details Section */
+.user-details {
+    margin-top: 20px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.user-details h2 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.user-details table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.user-details th,
+.user-details td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.user-details th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    color: #555;
+}
+
+.user-details td {
+    font-size: 14px;
+    word-break: break-word;
+}
+
+.user-details td:nth-child(3) {
+    font-family: monospace;
+    color: #555;
+}
+
+.user-details button {
+    background-color: #87CEEB;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-right: 10px;
+    margin-bottom: 3px;
+    transition: background-color 0.3s ease;
+}
+
+.user-details button:hover {
+    background-color: #4682B4;
+}
+
+.user-details button.delete {
+    background-color: #FF6347;
+    margin-right: 0;
+}
+
+.user-details button.delete:hover {
+    background-color: #FF4500;
+}
+
+/* User Profile Modal */
+.user-profile-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+}
+
+.user-profile-modal h2 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.user-profile-modal p {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.user-profile-modal button {
+    background-color: #87CEEB;
+    /* Light blue for modal button */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.user-profile-modal button:hover {
+    background-color: #4682B4;
+}
+
+/* Task Form Styles */
 .task-form {
-    margin-bottom: 20px;
+    margin-top: 20px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.task-form input,
+.task-form textarea,
+.task-form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.task-form textarea {
+    resize: vertical;
+    height: 100px;
 }
 
 .task-form label {
-    display: block;
-    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 14px;
+    cursor: pointer
 }
 
+.task-form label input[type="checkbox"] {
+    margin-right: 10px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.task-form button {
+    background-color: #87CEEB;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.task-form button:hover {
+    background-color: #4682B4;
+}
+
+/* Task List Styles */
 .task-list {
     margin-top: 20px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.task-list h2 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    color: #333;
 }
 
 .task-list div {
-    background: #f9f9f9;
+    margin-bottom: 20px;
     padding: 15px;
-    margin-bottom: 10px;
+    border: 1px solid #ddd;
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .task-list h3 {
-    margin-top: 0;
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #333;
 }
 
 .task-list p {
     margin: 5px 0;
+    font-size: 14px;
+    color: #555;
 }
 
-/* Responsive Design for AdminDashboard */
-@media (max-width: 600px) {
-    .admin-dashboard {
-        padding: 10px;
+/* Responsive Design */
+@media (max-width: 768px) {
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-header h1 {
+        margin-bottom: 10px;
+    }
+
+    .admin-header button {
+        margin: 5px 0;
+    }
+
+    .user-details table {
+        font-size: 12px;
+    }
+
+    .user-details th,
+    .user-details td {
+        padding: 8px;
     }
 
     .task-form input,
     .task-form textarea,
     .task-form select {
-        width: 100%;
+        font-size: 12px;
     }
 
-    .task-list div {
-        padding: 10px;
+    .task-list h3 {
+        font-size: 14px;
+    }
+
+    .task-list p {
+        font-size: 12px;
     }
 }
