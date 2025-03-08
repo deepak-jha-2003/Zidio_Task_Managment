@@ -1,0 +1,158 @@
+/* Global Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+h1,
+h2,
+h3 {
+    color: #2c3e50;
+}
+
+a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+input,
+textarea,
+select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.error-message {
+    color: #e74c3c;
+    margin-bottom: 15px;
+}
+
+.success-message {
+    color: #2ecc71;
+    margin-bottom: 15px;
+}
+
+/* Responsive Design for All Devices */
+/* Mobile Phones (up to 600px) */
+@media (max-width: 600px) {
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    button {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    input,
+    textarea,
+    select {
+        padding: 8px;
+        font-size: 14px;
+    }
+}
+
+/* Tablets (601px to 900px) */
+@media (min-width: 601px) and (max-width: 900px) {
+    body {
+        font-size: 16px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    h3 {
+        font-size: 20px;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+
+    input,
+    textarea,
+    select {
+        padding: 10px;
+        font-size: 16px;
+    }
+}
+
+/* Desktops and Larger Screens (901px and above) */
+@media (min-width: 901px) {
+    body {
+        font-size: 18px;
+    }
+
+    h1 {
+        font-size: 32px;
+    }
+
+    h2 {
+        font-size: 28px;
+    }
+
+    h3 {
+        font-size: 24px;
+    }
+
+    button {
+        padding: 12px 24px;
+        font-size: 18px;
+    }
+
+    input,
+    textarea,
+    select {
+        padding: 12px;
+        font-size: 18px;
+    }
+}

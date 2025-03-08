@@ -1,0 +1,44 @@
+/* TaskList.css */
+.task-list {
+    margin-top: 20px;
+}
+
+.task-list div {
+    background: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.task-list h3 {
+    margin-top: 0;
+}
+
+.task-list p {
+    margin: 5px 0;
+}
+
+.task-list button {
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.task-list button:hover {
+    background-color: #c0392b;
+}
+
+/* Responsive Design for TaskList */
+@media (max-width: 600px) {
+    .task-list div {
+        padding: 10px;
+    }
+
+    .task-list button {
+        width: 100%;
+    }
+}

@@ -1,0 +1,18 @@
+/* TaskForm.css */
+.task-form {
+    margin-bottom: 20px;
+}
+
+.task-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Responsive Design for TaskForm */
+@media (max-width: 600px) {
+
+    .task-form input,
+    .task-form textarea {
+        width: 100%;
+    }
+}

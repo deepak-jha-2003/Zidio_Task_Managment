@@ -1,0 +1,60 @@
+/* AdminDashboard.css */
+.admin-dashboard {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.admin-dashboard h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.task-form {
+    margin-bottom: 20px;
+}
+
+.task-form label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.task-list {
+    margin-top: 20px;
+}
+
+.task-list div {
+    background: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.task-list h3 {
+    margin-top: 0;
+}
+
+.task-list p {
+    margin: 5px 0;
+}
+
+/* Responsive Design for AdminDashboard */
+@media (max-width: 600px) {
+    .admin-dashboard {
+        padding: 10px;
+    }
+
+    .task-form input,
+    .task-form textarea,
+    .task-form select {
+        width: 100%;
+    }
+
+    .task-list div {
+        padding: 10px;
+    }
+}

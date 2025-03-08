@@ -1,0 +1,40 @@
+/* UserLogin.css */
+.user-login-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.user-login-container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.user-login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.signup-link {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.admin-login-form {
+    margin-top: 20px;
+}
+
+/* Responsive Design for UserLogin */
+@media (max-width: 600px) {
+    .user-login-container {
+        margin: 20px;
+        padding: 15px;
+    }
+
+    .user-login-form input {
+        width: 100%;
+    }
+}
