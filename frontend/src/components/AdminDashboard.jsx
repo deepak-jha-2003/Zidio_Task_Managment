@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
+import AdminNotification from './AdminNotification';
 
 const AdminDashboard = () => {
   const [title, setTitle] = useState('');
@@ -17,6 +18,7 @@ const AdminDashboard = () => {
   const [editingTask, setEditingTask] = useState(null);
   const formRef = useRef(null); // Ref for the form container
   const navigate = useNavigate();
+  const [showNotifications, setShowNotifications] = useState(false);
 
   // Helper function to format date for datetime-local input
   const formatDateForInput = (dateString) => {
@@ -173,9 +175,12 @@ const AdminDashboard = () => {
           <button onClick={toggleUserDetails} className="users-button">
             {showUserDetails ? 'Hide Users' : 'Show Users'}
           </button>
+          <button onClick={() => setShowNotifications(!showNotifications)} className="notification-icon">
+                        🔔
+          </button>
         </div>
       </header>
-
+      {showNotifications && <AdminNotification />}
       {showUserDetails && (
         <div className="user-details">
           <h2>User Details</h2>

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './UserDashboard.css';
+import UserNotification from './UserNotification';
 
 const UserDashboard = () => {
   const [tasks, setTasks] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   // Fetch tasks for the logged-in user
   useEffect(() => {
@@ -22,7 +25,16 @@ const UserDashboard = () => {
 
   return (
     <div className="user-dashboard">
-      <h1>User Dashboard</h1>
+      <header className="user-header">
+                <h1>User Dashboard</h1>
+                <div>
+                    {/* Notification Icon */}
+                    <button onClick={() => setShowNotifications(!showNotifications)} className="notification-icon">
+                        🔔
+                    </button>
+                </div>
+      </header>
+      {showNotifications && <UserNotification />}
       <h2>Your Tasks</h2>
       <div className="task-list">
       {tasks.map((task) => (

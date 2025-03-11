@@ -1,9 +1,10 @@
 const Task = require('../models/Task');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 
-// Create a task (admin only)
 exports.createTask = async (req, res) => {
     const { title, description, startTime, endTime, userId, broadcast } = req.body;
+
     try {
         let task;
 
@@ -16,6 +17,17 @@ exports.createTask = async (req, res) => {
                 endTime,
                 broadcast: true,
             });
+
+            // Create notifications for all users
+            const users = await User.find({ role: 'user' });
+            for (const user of users) {
+                const notification = new Notification({
+                    taskTitle: title,
+                    userEmail: user.email,
+                    userId: user._id,
+                });
+                await notification.save(); // Save the notification to the database
+            }
         } else {
             // Assign the task to a specific user
             const user = await User.findById(userId);
@@ -29,11 +41,20 @@ exports.createTask = async (req, res) => {
                 user: userId,
                 broadcast: false,
             });
+
+            // Create a notification for the assigned user
+            const notification = new Notification({
+                taskTitle: title,
+                userEmail: user.email,
+                userId: user._id,
+            });
+            await notification.save(); // Save the notification to the database
         }
 
-        await task.save();
+        await task.save(); // Save the task to the database
         res.json(task);
     } catch (err) {
+        console.error('Error creating task:', err);
         res.status(500).send('Server error');
     }
 };

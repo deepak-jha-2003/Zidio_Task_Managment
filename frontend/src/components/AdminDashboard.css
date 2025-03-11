@@ -319,3 +319,40 @@ body {
     background-color: #cc0000;
     /* Darker red */
 }
+
+.notification-icon {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.notification-icon:hover {
+    color: #007bff;
+}
+
+.admin-notification {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    z-index: 1000;
+    max-width: 300px;
+}
+
+.notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.error-message {
+    color: red;
+}
