@@ -70,6 +70,31 @@
     color: red;
 }
 
+.user-dashboard {
+    padding: 20px;
+}
+
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.task-list {
+    margin-top: 20px;
+}
+
+.task-urgent {
+    border: 2px solid red;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.complete-task-button {
+    margin-top: 10px;
+}
+
 /* Responsive Design for UserDashboard */
 @media (max-width: 600px) {
     .user-dashboard {

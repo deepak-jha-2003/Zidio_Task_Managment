@@ -16,22 +16,23 @@ const AdminDashboard = () => {
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [editingTask, setEditingTask] = useState(null);
-  const formRef = useRef(null); // Ref for the form container
-  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showPerformance, setShowPerformance] = useState(false);
+  const [performanceData, setPerformanceData] = useState([]); // Initialize as an empty array
+  const [selectedPerformanceUser, setSelectedPerformanceUser] = useState(null);
 
-  // Helper function to format date for datetime-local input
+  const formRef = useRef(null);
+  const navigate = useNavigate();
+
   const formatDateForInput = (dateString) => {
     const date = new Date(dateString);
-    return date.toISOString().slice(0, 16); // Remove seconds and milliseconds
+    return date.toISOString().slice(0, 16);
   };
 
-  // Fetch all users
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        console.error('No token found');
         navigate('/admin/login');
         return;
       }
@@ -48,12 +49,10 @@ const AdminDashboard = () => {
     }
   };
 
-  // Fetch all tasks
   const fetchTasks = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        console.error('No token found');
         navigate('/admin/login');
         return;
       }
@@ -70,12 +69,42 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchAllTasksWithCompletionStatus = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:5000/api/tasks/admin/performance', {
+        headers: { 'x-auth-token': token },
+      });
+      setPerformanceData(res.data || []); // Ensure it's an array
+      setShowPerformance(true);
+      setSelectedPerformanceUser(null);
+    } catch (err) {
+      console.error('Error fetching performance data:', err);
+    }
+  };
+
+  const fetchUserTasksWithCompletionStatus = async (userId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(
+        `http://localhost:5000/api/tasks/admin/performance/${userId}`,
+        {
+          headers: { 'x-auth-token': token },
+        }
+      );
+      setPerformanceData(res.data || []); // Ensure it's an array
+      setShowPerformance(true);
+      setSelectedPerformanceUser(userId);
+    } catch (err) {
+      console.error('Error fetching user performance data:', err);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
     fetchTasks();
   }, []);
 
-  // Handle task creation
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -103,14 +132,14 @@ const AdminDashboard = () => {
       await axios.delete(`http://localhost:5000/api/tasks/${taskId}`, {
         headers: { 'x-auth-token': token },
       });
-      setTasks(tasks.filter((task) => task._id !== taskId)); // Remove the deleted task
+      setTasks(tasks.filter((task) => task._id !== taskId));
     } catch (err) {
       console.error('Error deleting task:', err);
     }
   };
 
   const handleUpdateTask = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
+    e.preventDefault();
     try {
       const token = localStorage.getItem('token');
       const res = await axios.put(
@@ -125,10 +154,8 @@ const AdminDashboard = () => {
         },
         { headers: { 'x-auth-token': token } }
       );
-      setTasks(tasks.map((task) => (task._id === editingTask._id ? res.data : task))); // Update the task
-      setEditingTask(null); // Close the edit form
-
-      // Scroll to the form container
+      setTasks(tasks.map((task) => (task._id === editingTask._id ? res.data : task)));
+      setEditingTask(null);
       if (formRef.current) {
         formRef.current.scrollIntoView({ behavior: 'smooth' });
       }
@@ -137,23 +164,19 @@ const AdminDashboard = () => {
     }
   };
 
-  // Handle logout
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/admin/login');
   };
 
-  // Toggle user details visibility
   const toggleUserDetails = () => {
     setShowUserDetails(!showUserDetails);
   };
 
-  // Handle view profile
   const handleViewProfile = (user) => {
     setSelectedUser(user);
   };
 
-  // Handle delete user
   const handleDeleteUser = async (userId) => {
     try {
       const token = localStorage.getItem('token');
@@ -176,11 +199,16 @@ const AdminDashboard = () => {
             {showUserDetails ? 'Hide Users' : 'Show Users'}
           </button>
           <button onClick={() => setShowNotifications(!showNotifications)} className="notification-icon">
-                        🔔
+            🔔
+          </button>
+          <button onClick={fetchAllTasksWithCompletionStatus} className="performance-button">
+            Performance
           </button>
         </div>
       </header>
+
       {showNotifications && <AdminNotification />}
+
       {showUserDetails && (
         <div className="user-details">
           <h2>User Details</h2>
@@ -209,6 +237,9 @@ const AdminDashboard = () => {
                     <td>
                       <button onClick={() => handleViewProfile(user)}>View Profile</button>
                       <button onClick={() => handleDeleteUser(user._id)}>Delete User</button>
+                      <button onClick={() => fetchUserTasksWithCompletionStatus(user._id)}>
+                        View Performance
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -221,17 +252,63 @@ const AdminDashboard = () => {
       {selectedUser && (
         <div className="user-profile-modal">
           <h2>User Profile</h2>
-          <p><strong>Name:</strong> {selectedUser.name}</p>
-          <p><strong>Email:</strong> {selectedUser.email}</p>
-          <p><strong>Occupation:</strong> {selectedUser.occupation}</p>
-          <p><strong>Address:</strong> {selectedUser.address}</p>
-          <p><strong>Phone Number:</strong> {selectedUser.phoneNumber}</p>
-          <p><strong>Social Links:</strong> {selectedUser.socialLinks.join(', ')}</p>
+          <p>
+            <strong>Name:</strong> {selectedUser.name}
+          </p>
+          <p>
+            <strong>Email:</strong> {selectedUser.email}
+          </p>
+          <p>
+            <strong>Occupation:</strong> {selectedUser.occupation}
+          </p>
+          <p>
+            <strong>Address:</strong> {selectedUser.address}
+          </p>
+          <p>
+            <strong>Phone Number:</strong> {selectedUser.phoneNumber}
+          </p>
+          <p>
+            <strong>Social Links:</strong> {selectedUser.socialLinks.join(', ')}
+          </p>
           <button onClick={() => setSelectedUser(null)}>Close</button>
         </div>
       )}
 
-      {/* Add the ref to the form container */}
+      {showPerformance && (
+        <div className="performance-modal">
+          <h2>{selectedPerformanceUser ? `Performance for User: ${selectedPerformanceUser}` : 'All Tasks Performance'}</h2>
+          <div className="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Task Title</th>
+                  <th>Assigned To</th>
+                  <th>Completed By</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.isArray(performanceData) && performanceData.map((task) => (
+                  <tr key={task._id}>
+                    <td>{task.title}</td>
+                    <td>{task.user ? task.user.email : 'Broadcasted to all users'}</td>
+                    <td>
+                      {task.completedBy.length > 0
+                        ? task.completedBy.map((user) => user.email).join(', ')
+                        : 'No one'}
+                    </td>
+                    <td>
+                      {task.completedBy.length > 0 ? 'Completed' : 'Not Completed'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <button onClick={() => setShowPerformance(false)}>Close</button>
+        </div>
+      )}
+
       <div ref={formRef}>
         {editingTask ? (
           <form onSubmit={handleUpdateTask} className="task-form">
@@ -344,7 +421,7 @@ const AdminDashboard = () => {
       <h2>All Tasks</h2>
       <div className="task-list">
         {tasks.map((task) => (
-          <div key={task._id}>
+          <div key={task._id} className={task.urgent ? 'task-urgent' : ''}>
             <h3>{task.title}</h3>
             <p>{task.description}</p>
             <p>Start Time: {new Date(task.startTime).toLocaleString()}</p>

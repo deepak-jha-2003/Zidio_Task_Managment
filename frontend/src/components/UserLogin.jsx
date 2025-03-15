@@ -15,6 +15,7 @@ const UserLogin = () => {
     try {
       const res = await axios.post('http://localhost:5000/api/auth/user/login', { email, password });
       localStorage.setItem('token', res.data.token);
+      localStorage.setItem('userId', res.data.user.id);
       navigate('/user/dashboard'); // Redirect to the user dashboard
     } catch (err) {
       setError('Invalid Credentials');

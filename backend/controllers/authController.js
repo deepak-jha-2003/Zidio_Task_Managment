@@ -35,32 +35,29 @@ exports.userSignup = async (req, res) => {
 exports.userLogin = async (req, res) => {
     const { email, password } = req.body;
 
-    // console.log('Login request received:', { email, password }); // Debugging: Log the request
-
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            // console.log('User not found:', email); // Debugging: Log if user is not found
             return res.status(400).json({ msg: 'Invalid Credentials' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            // console.log('Password does not match for user:', email); // Debugging: Log if password is incorrect
             return res.status(400).json({ msg: 'Invalid Credentials' });
         }
 
         const payload = { user: { id: user.id, role: user.role } };
+
         jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
             if (err) throw err;
-            // console.log('Login successful:', email); // Debugging: Log successful login
-            res.json({ token });
+            res.json({ token, user: { id: user.id, email: user.email } }); // Include user ID in the response
         });
     } catch (err) {
-        // console.error('Login error:', err); // Debugging: Log any errors
+        console.error('Login error:', err);
         res.status(500).send('Server error');
     }
 };
+
 // Admin Login
 exports.adminLogin = async (req, res) => {
     const { email, password } = req.body;
