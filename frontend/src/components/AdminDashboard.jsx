@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
 import AdminNotification from './AdminNotification';
+import Footer from './Footer';
 
 const AdminDashboard = () => {
   const [title, setTitle] = useState('');
@@ -435,6 +436,9 @@ const AdminDashboard = () => {
             </button>
           </div>
         ))}
+      </div>
+      <div className="app">
+        <Footer />
       </div>
     </div>
   );

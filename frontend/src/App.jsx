@@ -5,6 +5,8 @@ import Signup from './components/Signup';
 import UserDashboard from './components/UserDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
 function App() {
   return (
@@ -12,10 +14,11 @@ function App() {
       <Routes>
         {/* Default route: Redirect to /user/login */}
         <Route path="/" element={<Navigate to="/user/login" />} />
-
         {/* User routes */}
         <Route path="/user/login" element={<UserLogin />} />
         <Route path="/user/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
         <Route
           path="/user/dashboard"
           element={
@@ -25,7 +28,7 @@ function App() {
           }
         />
 
-        {/* Admin routes (not linked in the UI) */}
+        {/* Admin routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route
           path="/admin/dashboard"

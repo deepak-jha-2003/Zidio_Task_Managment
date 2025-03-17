@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './UserDashboard.css';
 import UserNotification from './UserNotification';
+import Footer from './Footer';
+import { useNavigate } from 'react-router-dom';
 
 const UserDashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
-  const userId = localStorage.getItem('userId'); // Ensure userId is stored in localStorage during login
+  const userId = localStorage.getItem('userId'); 
+  const navigate = useNavigate();
 
   // Fetch tasks when the component loads
   useEffect(() => {
@@ -111,6 +114,10 @@ const UserDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handleLogout = () => {
+    navigate('/user/login'); // Redirect to the login page
+};
+
   return (
     <div className="user-dashboard">
       <header className="user-header">
@@ -118,6 +125,9 @@ const UserDashboard = () => {
         <div>
           <button onClick={() => setShowNotifications(!showNotifications)} className="notification-icon">
             🔔
+          </button>
+          <button onClick={handleLogout} className="logout-button">
+            Logout
           </button>
         </div>
       </header>
@@ -152,6 +162,9 @@ const UserDashboard = () => {
             </div>
           );
         })}
+      </div>
+      <div className="app">
+        <Footer />
       </div>
     </div>
   );

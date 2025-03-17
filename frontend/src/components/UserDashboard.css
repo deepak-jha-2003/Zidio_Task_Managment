@@ -95,6 +95,20 @@
     margin-top: 10px;
 }
 
+.logout-button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.logout-button:hover {
+    background-color: #ff1a1a;
+}
+
 /* Responsive Design for UserDashboard */
 @media (max-width: 600px) {
     .user-dashboard {

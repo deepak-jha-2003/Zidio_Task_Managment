@@ -7,7 +7,7 @@ const UserLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [showAdminLogin, setShowAdminLogin] = useState(false); // State to toggle admin login
+  const [showAdminLogin, setShowAdminLogin] = useState(false); 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -22,7 +22,6 @@ const UserLogin = () => {
     }
   };
 
-  // Toggle admin login visibility (e.g., by pressing a secret key combination)
   const toggleAdminLogin = () => {
     setShowAdminLogin(!showAdminLogin);
   };
@@ -48,6 +47,9 @@ const UserLogin = () => {
         />
         <button type="submit" className="submit-button">Login</button>
       </form>
+      <p className="forgot-password-link">
+        <Link to="/forgot-password">Forgot Password?</Link>
+      </p>
       <p className="signup-link">
         Don't have an account? <Link to="/user/signup">Sign Up</Link>
       </p>

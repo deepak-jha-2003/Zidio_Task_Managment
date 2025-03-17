@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { userSignup } = require('../controllers/authController');
 const upload = require('../middleware/upload'); // Import the upload middleware
-const { userLogin } = require('../controllers/authController'); // Import the userLogin function
-const { adminLogin } = require('../controllers/authController'); // Import the adminLogin function
+const { userSignup, userLogin, adminLogin, forgotPassword, resetPassword } = require('../controllers/authController');
+
 
 // Signup route with file upload
 router.post('/user/signup', upload.single('photograph'), userSignup);
@@ -13,5 +12,10 @@ router.post('/user/login', userLogin);
 
 // Admin Login Route
 router.post('/admin/login', adminLogin);
+
+router.post('/forgot-password', forgotPassword);
+
+router.put('/reset-password/:resetToken', resetPassword);
+
 
 module.exports = router;

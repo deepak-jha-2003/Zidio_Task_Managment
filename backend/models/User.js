@@ -11,6 +11,8 @@ const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, enum: ['admin', 'user'], default: 'user' },
+    resetPasswordToken: { type: String }, // Add this field
+    resetPasswordExpire: { type: Date },  // Add this field
 });
 
 UserSchema.pre('save', async function (next) {
