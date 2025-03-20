@@ -10,7 +10,7 @@ const AdminDashboard = () => {
   const [description, setDescription] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
-  const [userId, setUserId] = useState('');
+  const [selectedUsers, setSelectedUsers] = useState([]); // Array of selected user IDs
   const [broadcast, setBroadcast] = useState(false);
   const [users, setUsers] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -21,6 +21,8 @@ const AdminDashboard = () => {
   const [showPerformance, setShowPerformance] = useState(false);
   const [performanceData, setPerformanceData] = useState([]); // Initialize as an empty array
   const [selectedPerformanceUser, setSelectedPerformanceUser] = useState(null);
+  const [error, setError] = useState(''); // Error state for displaying error messages
+  const [showUserSelection, setShowUserSelection] = useState(false); // State to show/hide user selection
 
   const formRef = useRef(null);
   const navigate = useNavigate();
@@ -61,8 +63,10 @@ const AdminDashboard = () => {
         headers: { 'x-auth-token': token },
       });
       setTasks(res.data);
+      setError(''); // Clear any previous errors
     } catch (err) {
       console.error('Error fetching tasks:', err);
+      setError('Failed to fetch tasks. Please try again.');
       if (err.response?.status === 401) {
         localStorage.removeItem('token');
         navigate('/admin/login');
@@ -81,6 +85,7 @@ const AdminDashboard = () => {
       setSelectedPerformanceUser(null);
     } catch (err) {
       console.error('Error fetching performance data:', err);
+      setError('Failed to fetch performance data. Please try again.');
     }
   };
 
@@ -98,6 +103,7 @@ const AdminDashboard = () => {
       setSelectedPerformanceUser(userId);
     } catch (err) {
       console.error('Error fetching user performance data:', err);
+      setError('Failed to fetch user performance data. Please try again.');
     }
   };
 
@@ -106,13 +112,21 @@ const AdminDashboard = () => {
     fetchTasks();
   }, []);
 
+  const handleUserSelection = (userId) => {
+    if (selectedUsers.includes(userId)) {
+      setSelectedUsers(selectedUsers.filter((id) => id !== userId));
+    } else {
+      setSelectedUsers([...selectedUsers, userId]);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
         'http://localhost:5000/api/tasks',
-        { title, description, startTime, endTime, userId, broadcast },
+        { title, description, startTime, endTime, userIds: selectedUsers, broadcast },
         { headers: { 'x-auth-token': token } }
       );
       setTasks([...tasks, res.data]);
@@ -120,10 +134,12 @@ const AdminDashboard = () => {
       setDescription('');
       setStartTime('');
       setEndTime('');
-      setUserId('');
+      setSelectedUsers([]);
       setBroadcast(false);
+      setShowUserSelection(false); // Hide user selection after task creation
     } catch (err) {
       console.error('Task creation error:', err);
+      setError('Failed to create task. Please try again.');
     }
   };
 
@@ -136,6 +152,7 @@ const AdminDashboard = () => {
       setTasks(tasks.filter((task) => task._id !== taskId));
     } catch (err) {
       console.error('Error deleting task:', err);
+      setError('Failed to delete task. Please try again.');
     }
   };
 
@@ -150,7 +167,7 @@ const AdminDashboard = () => {
           description: editingTask.description,
           startTime: editingTask.startTime,
           endTime: editingTask.endTime,
-          userId: editingTask.userId,
+          userIds: editingTask.userIds,
           broadcast: editingTask.broadcast,
         },
         { headers: { 'x-auth-token': token } }
@@ -162,6 +179,7 @@ const AdminDashboard = () => {
       }
     } catch (err) {
       console.error('Error updating task:', err);
+      setError('Failed to update task. Please try again.');
     }
   };
 
@@ -187,6 +205,7 @@ const AdminDashboard = () => {
       setUsers(users.filter((user) => user._id !== userId));
     } catch (err) {
       console.error('Error deleting user:', err);
+      setError('Failed to delete user. Please try again.');
     }
   };
 
@@ -209,6 +228,8 @@ const AdminDashboard = () => {
       </header>
 
       {showNotifications && <AdminNotification />}
+
+      {error && <p className="error-message">{error}</p>}
 
       {showUserDetails && (
         <div className="user-details">
@@ -292,10 +313,10 @@ const AdminDashboard = () => {
                 {Array.isArray(performanceData) && performanceData.map((task) => (
                   <tr key={task._id}>
                     <td>{task.title}</td>
-                    <td>{task.user ? task.user.email : 'Broadcasted to all users'}</td>
+                    <td>{task.broadcast ? "Broadcasted to all users" : task.users ? task.users.map(user => user.name).join(', ') : 'No users assigned'}</td>
                     <td>
                       {task.completedBy.length > 0
-                        ? task.completedBy.map((user) => user.email).join(', ')
+                        ? task.completedBy.map((user) => user.name).join(', ')
                         : 'No one'}
                     </td>
                     <td>
@@ -349,18 +370,28 @@ const AdminDashboard = () => {
               Broadcast to all users
             </label>
             {!editingTask.broadcast && (
-              <select
-                value={editingTask.userId}
-                onChange={(e) => setEditingTask({ ...editingTask, userId: e.target.value })}
-                required
-              >
-                <option value="">Select a user</option>
-                {users.map((user) => (
-                  <option key={user._id} value={user._id}>
-                    {user.name} ({user.email})
-                  </option>
-                ))}
-              </select>
+              <div className="user-selection">
+                <h3>Select Users:</h3>
+                <div className="dropdown">
+                  <button type="button" className="dropdown-toggle" onClick={() => setShowUserSelection(!showUserSelection)}>
+                    Select Users
+                  </button>
+                  {showUserSelection && (
+                    <div className="dropdown-menu">
+                      {users.map((user) => (
+                        <label key={user._id}>
+                          <input
+                            type="checkbox"
+                            checked={editingTask.userIds?.includes(user._id)}
+                            onChange={() => handleUserSelection(user._id)}
+                          />
+                          {user.name} ({user.email})
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
             <button type="submit" className="edit-task-button">Update Task</button>
             <button type="button" onClick={() => setEditingTask(null)} className="cancel-button">
@@ -400,19 +431,36 @@ const AdminDashboard = () => {
               <input
                 type="checkbox"
                 checked={broadcast}
-                onChange={(e) => setBroadcast(e.target.checked)}
+                onChange={(e) => {
+                  setBroadcast(e.target.checked);
+                  setShowUserSelection(!e.target.checked); // Show user selection when broadcast is unchecked
+                }}
               />
               Broadcast to all users
             </label>
             {!broadcast && (
-              <select value={userId} onChange={(e) => setUserId(e.target.value)} required>
-                <option value="">Select a user</option>
-                {users.map((user) => (
-                  <option key={user._id} value={user._id}>
-                    {user.name} ({user.email})
-                  </option>
-                ))}
-              </select>
+              <div className="user-selection">
+                <h3>Select Users:</h3>
+                <div className="dropdown">
+                  <button type="button" className="dropdown-toggle" onClick={() => setShowUserSelection(!showUserSelection)}>
+                    Select Users
+                  </button>
+                  {showUserSelection && (
+                    <div className="dropdown-menu">
+                      {users.map((user) => (
+                        <label key={user._id}>
+                          <input
+                            type="checkbox"
+                            checked={selectedUsers.includes(user._id)}
+                            onChange={() => handleUserSelection(user._id)}
+                          />
+                          {user.name} ({user.email})
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
             <button type="submit" className="create-task-button">Create Task</button>
           </form>
@@ -427,7 +475,14 @@ const AdminDashboard = () => {
             <p>{task.description}</p>
             <p>Start Time: {new Date(task.startTime).toLocaleString()}</p>
             <p>End Time: {new Date(task.endTime).toLocaleString()}</p>
-            <p>Assigned To: {task.user ? task.user.name : 'Broadcasted to all users'}</p>
+            <p>
+              Assigned To:{" "}
+              {task.broadcast
+                ? "Broadcasted to all users"
+                : task.users && task.users.length > 0
+                ? task.users.map((user) => user.name).join(", ")
+                : "No users assigned"}
+            </p>
             <button onClick={() => setEditingTask(task)} className="edit-task-button">
               Edit
             </button>
