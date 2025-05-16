@@ -34,6 +34,12 @@ const taskRoutes = require('./routes/tasks');
 const adminRoutes = require('./routes/admin');
 const notificationRoutes = require('./routes/notification');
 
+// Add this with other route imports
+const meetingRoutes = require('./routes/meeting');
+
+// Add this with other route uses
+app.use('/api/meetings', meetingRoutes);
+
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);

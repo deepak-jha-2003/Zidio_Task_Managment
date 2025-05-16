@@ -1,0 +1,22 @@
+.meeting-calendar {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rbc-event {
+    background-color: #4CAF50;
+    border: none;
+    padding: 2px 5px;
+    border-radius: 4px;
+}
+
+.rbc-today {
+    background-color: #f0f8ff;
+}
+
+.rbc-header {
+    padding: 10px 0;
+}

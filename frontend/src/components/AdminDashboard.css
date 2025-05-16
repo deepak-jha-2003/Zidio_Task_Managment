@@ -572,6 +572,35 @@ button:hover {
     margin-right: 10px;
 }
 
+.task-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.toggle-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-button:hover {
+    background-color: #0056b3;
+}
+
+.task-urgent .toggle-button {
+    background-color: #dc3545;
+}
+
+.task-urgent .toggle-button:hover {
+    background-color: #c82333;
+}
+
 @media (max-width: 768px) {
     .table-responsive {
         width: 100%;

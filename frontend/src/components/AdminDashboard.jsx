@@ -4,13 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
 import AdminNotification from './AdminNotification';
 import Footer from './Footer';
+import CommentSection from './CommentSection';
+import FileSection from './FileSection';
+import MeetingList from './MeetingList';
+import MeetingCalendar from './MeetingCalendar';
+import CreateMeetingModal from './CreateMeetingModal';
+import JitsiMeetingComponent from './JitsiMeetingComponent';
 
 const AdminDashboard = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
-  const [selectedUsers, setSelectedUsers] = useState([]); // Array of selected user IDs
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const [broadcast, setBroadcast] = useState(false);
   const [users, setUsers] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -19,10 +25,16 @@ const AdminDashboard = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showPerformance, setShowPerformance] = useState(false);
-  const [performanceData, setPerformanceData] = useState([]); // Initialize as an empty array
+  const [performanceData, setPerformanceData] = useState([]);
   const [selectedPerformanceUser, setSelectedPerformanceUser] = useState(null);
-  const [error, setError] = useState(''); // Error state for displaying error messages
-  const [showUserSelection, setShowUserSelection] = useState(false); // State to show/hide user selection
+  const [error, setError] = useState('');
+  const [showUserSelection, setShowUserSelection] = useState(false);
+  const [showComments, setShowComments] = useState({}); 
+  const [showFiles, setShowFiles] = useState({});
+  const [meetings, setMeetings] = useState([]);
+  const [showCreateMeetingModal, setShowCreateMeetingModal] = useState(false);
+  const [activeMeeting, setActiveMeeting] = useState(null);
+  const [showMeetingCalendar, setShowMeetingCalendar] = useState(false);
 
   const formRef = useRef(null);
   const navigate = useNavigate();
@@ -30,6 +42,71 @@ const AdminDashboard = () => {
   const formatDateForInput = (dateString) => {
     const date = new Date(dateString);
     return date.toISOString().slice(0, 16);
+  };
+
+  const fetchMeetings = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:5000/api/meetings/admin', {
+        headers: { 
+          'x-auth-token': token,
+          'Content-Type': 'application/json'
+        }
+      });
+      setMeetings(res.data);
+    } catch (err) {
+      console.error('Error fetching meetings:', err);
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        localStorage.removeItem('token');
+        navigate('/admin/login');
+      }
+      setError(err.response?.data?.msg || 'Failed to fetch meetings');
+    }
+  };
+  
+  const handleCreateMeeting = async (meetingData) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post(
+        'http://localhost:5000/api/meetings',
+        meetingData,
+        { headers: { 'x-auth-token': token } }
+      );
+      
+      setMeetings(prev => [...prev, res.data]);
+      setShowCreateMeetingModal(false);
+    } catch (err) {
+      console.error('Meeting creation error:', err);
+      setError(err.response?.data?.msg || 'Failed to create meeting');
+    }
+  };
+
+  const handleDeleteMeeting = async (meetingId) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/meetings/${meetingId}`, {
+        headers: { 'x-auth-token': token },
+      });
+      setMeetings(meetings.filter(meeting => meeting._id !== meetingId));
+    } catch (err) {
+      console.error('Error deleting meeting:', err);
+      setError('Failed to delete meeting. Please try again.');
+    }
+  };
+
+  const handleJoinMeeting = (roomName) => {
+    setActiveMeeting(roomName);
+  };
+
+  const handleMeetingEnd = () => {
+    setActiveMeeting(null);
+  };
+
+  const handleSelectMeeting = (meetingId) => {
+    const meeting = meetings.find(m => m._id === meetingId);
+    if (meeting) {
+      setActiveMeeting(meeting.roomName);
+    }
   };
 
   const fetchUsers = async () => {
@@ -45,6 +122,7 @@ const AdminDashboard = () => {
       setUsers(res.data);
     } catch (err) {
       console.error('Error fetching users:', err);
+      setError('Failed to fetch users. Please try again.');
       if (err.response?.status === 401) {
         localStorage.removeItem('token');
         navigate('/admin/login');
@@ -63,7 +141,7 @@ const AdminDashboard = () => {
         headers: { 'x-auth-token': token },
       });
       setTasks(res.data);
-      setError(''); // Clear any previous errors
+      setError('');
     } catch (err) {
       console.error('Error fetching tasks:', err);
       setError('Failed to fetch tasks. Please try again.');
@@ -80,7 +158,7 @@ const AdminDashboard = () => {
       const res = await axios.get('http://localhost:5000/api/tasks/admin/performance', {
         headers: { 'x-auth-token': token },
       });
-      setPerformanceData(res.data || []); // Ensure it's an array
+      setPerformanceData(res.data || []);
       setShowPerformance(true);
       setSelectedPerformanceUser(null);
     } catch (err) {
@@ -98,7 +176,7 @@ const AdminDashboard = () => {
           headers: { 'x-auth-token': token },
         }
       );
-      setPerformanceData(res.data || []); // Ensure it's an array
+      setPerformanceData(res.data || []);
       setShowPerformance(true);
       setSelectedPerformanceUser(userId);
     } catch (err) {
@@ -110,6 +188,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchUsers();
     fetchTasks();
+    fetchMeetings();
   }, []);
 
   const handleUserSelection = (userId) => {
@@ -136,7 +215,8 @@ const AdminDashboard = () => {
       setEndTime('');
       setSelectedUsers([]);
       setBroadcast(false);
-      setShowUserSelection(false); // Hide user selection after task creation
+      setShowUserSelection(false);
+      setError('');
     } catch (err) {
       console.error('Task creation error:', err);
       setError('Failed to create task. Please try again.');
@@ -150,6 +230,7 @@ const AdminDashboard = () => {
         headers: { 'x-auth-token': token },
       });
       setTasks(tasks.filter((task) => task._id !== taskId));
+      setError('');
     } catch (err) {
       console.error('Error deleting task:', err);
       setError('Failed to delete task. Please try again.');
@@ -174,6 +255,7 @@ const AdminDashboard = () => {
       );
       setTasks(tasks.map((task) => (task._id === editingTask._id ? res.data : task)));
       setEditingTask(null);
+      setError('');
       if (formRef.current) {
         formRef.current.scrollIntoView({ behavior: 'smooth' });
       }
@@ -203,10 +285,25 @@ const AdminDashboard = () => {
         headers: { 'x-auth-token': token },
       });
       setUsers(users.filter((user) => user._id !== userId));
+      setError('');
     } catch (err) {
       console.error('Error deleting user:', err);
       setError('Failed to delete user. Please try again.');
     }
+  };
+
+  const toggleComments = (taskId) => {
+    setShowComments((prev) => ({
+      ...prev,
+      [taskId]: !prev[taskId],
+    }));
+  };
+
+  const toggleFiles = (taskId) => {
+    setShowFiles((prev) => ({
+      ...prev,
+      [taskId]: !prev[taskId],
+    }));
   };
 
   return (
@@ -224,8 +321,46 @@ const AdminDashboard = () => {
           <button onClick={fetchAllTasksWithCompletionStatus} className="performance-button">
             Performance
           </button>
+          <button onClick={() => setShowCreateMeetingModal(true)} className="create-meeting-button">
+            Create Meeting
+          </button>
+          <button onClick={() => setShowMeetingCalendar(!showMeetingCalendar)} className="calendar-button">
+            {showMeetingCalendar ? 'Hide Calendar' : 'Show Calendar'}
+          </button>
         </div>
       </header>
+
+      {showCreateMeetingModal && (
+        <CreateMeetingModal 
+          users={users} 
+          onClose={() => setShowCreateMeetingModal(false)} 
+          onMeetingCreated={handleCreateMeeting}
+        />
+      )}
+
+      {activeMeeting ? (
+        <JitsiMeetingComponent 
+          roomName={activeMeeting} 
+          onMeetingEnd={handleMeetingEnd}
+          user={{ name: 'Admin', email: 'admin@example.com' }}
+        />
+      ) : (
+        <>
+          {showMeetingCalendar ? (
+            <MeetingCalendar 
+              meetings={meetings} 
+              onSelectMeeting={handleSelectMeeting}
+            />
+          ) : (
+            <MeetingList 
+              meetings={meetings} 
+              onJoinMeeting={handleJoinMeeting}
+              onDeleteMeeting={handleDeleteMeeting}
+              isAdmin={true}
+            />
+          )}
+        </>
+      )}
 
       {showNotifications && <AdminNotification />}
 
@@ -255,7 +390,7 @@ const AdminDashboard = () => {
                     <td>{user.occupation}</td>
                     <td>{user.address}</td>
                     <td>{user.phoneNumber}</td>
-                    <td>{user.socialLinks.join(', ')}</td>
+                    <td>{user.socialLinks?.join(', ') || 'None'}</td>
                     <td>
                       <button onClick={() => handleViewProfile(user)}>View Profile</button>
                       <button onClick={() => handleDeleteUser(user._id)}>Delete User</button>
@@ -290,7 +425,7 @@ const AdminDashboard = () => {
             <strong>Phone Number:</strong> {selectedUser.phoneNumber}
           </p>
           <p>
-            <strong>Social Links:</strong> {selectedUser.socialLinks.join(', ')}
+            <strong>Social Links:</strong> {selectedUser.socialLinks?.join(', ') || 'None'}
           </p>
           <button onClick={() => setSelectedUser(null)}>Close</button>
         </div>
@@ -315,12 +450,12 @@ const AdminDashboard = () => {
                     <td>{task.title}</td>
                     <td>{task.broadcast ? "Broadcasted to all users" : task.users ? task.users.map(user => user.name).join(', ') : 'No users assigned'}</td>
                     <td>
-                      {task.completedBy.length > 0
+                      {task.completedBy?.length > 0
                         ? task.completedBy.map((user) => user.name).join(', ')
                         : 'No one'}
                     </td>
                     <td>
-                      {task.completedBy.length > 0 ? 'Completed' : 'Not Completed'}
+                      {task.completedBy?.length > 0 ? 'Completed' : 'Not Completed'}
                     </td>
                   </tr>
                 ))}
@@ -433,7 +568,7 @@ const AdminDashboard = () => {
                 checked={broadcast}
                 onChange={(e) => {
                   setBroadcast(e.target.checked);
-                  setShowUserSelection(!e.target.checked); // Show user selection when broadcast is unchecked
+                  setShowUserSelection(!e.target.checked);
                 }}
               />
               Broadcast to all users
@@ -489,6 +624,16 @@ const AdminDashboard = () => {
             <button onClick={() => handleDeleteTask(task._id)} className="delete-task-button">
               Delete
             </button>
+            <div className="task-actions">
+              <button onClick={() => toggleComments(task._id)} className="toggle-button">
+                {showComments[task._id] ? 'Hide Comments' : 'Show Comments'}
+              </button>
+              <button onClick={() => toggleFiles(task._id)} className="toggle-button">
+                {showFiles[task._id] ? 'Hide Files' : 'Show Files'}
+              </button>
+            </div>
+            {showComments[task._id] && <CommentSection taskId={task._id} />}
+            {showFiles[task._id] && <FileSection taskId={task._id} />}
           </div>
         ))}
       </div>

@@ -49,6 +49,17 @@ const UserNotification = () => {
             ) : (
                 <p>No new notifications</p>
             )}
+            // Add this to the notification item rendering
+            {notification.meetingId && (
+                <button 
+                    onClick={() => {
+                        // Handle joining meeting
+                    }}
+                    className="join-meeting-button"
+                >
+                    Join Meeting
+                </button>
+            )}
         </div>
     );
 };

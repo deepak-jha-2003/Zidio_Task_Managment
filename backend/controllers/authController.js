@@ -64,28 +64,30 @@ exports.userLogin = async (req, res) => {
 exports.adminLogin = async (req, res) => {
     const { email, password } = req.body;
 
-    // console.log('Admin login request received:', { email, password }); // Debugging: Log the request
-
     try {
-        // Check if the provided credentials match the admin credentials in .env
-        if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
-            // console.log('Invalid admin credentials:', { email, password }); // Debugging: Log invalid credentials
+        // Get or create admin user
+        const admin = await User.createAdminUser();
+
+        if (email !== admin.email || password !== process.env.ADMIN_PASSWORD) {
             return res.status(400).json({ msg: 'Invalid Admin Credentials' });
         }
 
-        // Generate a JWT token
-        const payload = { user: { id: 'admin', role: 'admin' } };
+        const payload = {
+            user: {
+                id: admin._id, // Proper ObjectId from the database
+                role: 'admin'
+            }
+        };
+
         jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
             if (err) throw err;
-            // console.log('Admin login successful:', { email }); // Debugging: Log successful login
             res.json({ token });
         });
     } catch (err) {
-        // console.error('Admin login error:', err); // Debugging: Log any errors
+        console.error('Admin login error:', err);
         res.status(500).send('Server error');
     }
 };
-
 // Forgot Password
 exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
@@ -154,6 +156,19 @@ exports.resetPassword = async (req, res) => {
         res.status(200).json({ msg: 'Password reset successful' });
     } catch (err) {
         console.error('Reset password error:', err);
+        res.status(500).send('Server error');
+    }
+};
+
+exports.getCurrentUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+        res.json(user);
+    } catch (err) {
+        console.error('Error fetching user:', err);
         res.status(500).send('Server error');
     }
 };
